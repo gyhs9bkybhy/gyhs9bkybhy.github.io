@@ -20,9 +20,14 @@
                 In this narrative visualization, we will go through the timeline globally and then drill down to the country-level to see 
                 the situations of specific countries.  
             </p>
-            <p style = 'color: Tomato'>(Click the button at the bottom to drill down to country-level)</p>
+            <h2> Global Timeline from 2020/01/22 to 2021/0607</h2>
+            <p> This page displays the timeline of Covid-10 at the world-level. The left column shows the global confirmed cases on a daily basis,
+                and the right column shows important events that happened on a specific date.
+            </p>
+            <p style = 'color: Tomato'>In the line chart, You can hover to see total cases and click the bar to see important events.
+                After that, you can click the button at the bottom to drill down to country-level.</p>
             <div style = 'width: 720px; float: left;'>
-                <h2> Global Timeline </h2>
+                <h3> Global Situation </h3>
                 <svg id = 'mainsvg' width = '720' height = '600'></svg>
                 <button onclick="location.href='drilldown.html'" type="button" 
                     style = 'margin: 10px;
@@ -40,7 +45,7 @@
                     border-color: #2e6da4;'> Drill down to country level </button>
             </div>
             <div style = 'margin-left: 720px; background-color:rgba(105, 102, 102, 0.144)'>
-                <h2> Important Events </h2>
+                <h3> Important Events </h3>
                 <p id = 'p_event'  style = 'color: Tomato'> (Click the Line Chart to See Events on the selected Date.) </p>
             </div>
         </div>

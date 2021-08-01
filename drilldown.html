@@ -19,9 +19,15 @@
                 In this narrative visualization, we will go through the timeline globally and then drill down to the country-level to see 
                 the situations of specific countries.  
             </p>
-            <p id = 'hint' style = 'color: Tomato'>(Click the button at the bottom to move back to timeline)</p>
             <h2 id = 'subhead'  text-align = 'center' style = 'font-size: 30px'> A big picture at the country-level </h2>
-            <p id = 'hint_2to3' style = 'color: Tomato'>(Click each point to drill down to a specific country)</p>
+            <p id = 'description'>In this page, a big picture consisting of all the countries are shown dynamically by the number of confirmed and death cases. 
+                You can easily compare and see a country's situation in comparison with others. Some representative countries with 
+                large population from different continents are annotated for convenience.
+            </p>
+            <p id = 'hint' style = 'color: Tomato'>In the scatter plot, you can hover to see each country's cases, and click to go to
+                the next scene which is the detailed time serial visualization of a specific country. You can also click the buttom at the 
+                bottom to go back to the previous page of global timeline.
+            </p>
             <svg id = 'mainsvg' width = '1000' height = '800'></svg>
             <button id = 'switch' onclick="location.href='index.html'" type="button" 
                         style = 'margin: 10px;
@@ -262,8 +268,7 @@
                     g_scatter.style('visibility', 'hidden');
                     scene3(d.Country);
                     document.getElementById('switch').innerText = 'Back to the big picture';
-                    document.getElementById('hint').innerText = '(Click the button at the bottom to move back to the big picture)';
-                    document.getElementById('hint_2to3').innerText = '';
+
                 });
 
 
@@ -474,6 +479,9 @@
 
                 document.getElementById('switch').onclick = switchfrom3to2;
                 document.getElementById('subhead').innerText = 'The situation of ' + country;
+                document.getElementById('description').innerText = "In this page, we drill down even deeper to focus on a specific country that you are interested in. Time-serial information including the number of confirmed and death cases are displayed.";
+                document.getElementById('hint').innerText = "You can hover on the line chart to see the situation on a daily basis. After exploration, you can go back to the previous page of the big picture of all countries by clicking the button at the bottom.";
+                
             };
 
             async function scene2(){
@@ -530,9 +538,9 @@
                 legend.style('visibility', 'hidden');
                 document.getElementById('switch').onclick = function(){location.href='index.html'};
                 document.getElementById('switch').innerText = 'Back to the timeline';
-                document.getElementById('hint').innerText = '(Click the button at the bottom to move back to timeline)';
+                document.getElementById('description').innerText = "In this page, a big picture consisting of all the countries are shown dynamically by the number of confirmed and death cases. You can easily compare and see a country's situation in comparison with others. Some representative countries with large population from different continents are annotated for convenience.";
+                document.getElementById('hint').innerText = "In the scatter plot, you can hover to see each country's cases, and click to go to the next scene which is the detailed time serial visualization of a specific country. You can also click the buttom at the bottom to go back to the previous page of global timeline.";
                 document.getElementById('subhead').innerText = 'A big picture at the country-level';
-                document.getElementById('hint_2to3').innerText = '(Click each point to drill down to a specific country)';
             };
             
             scene2();
