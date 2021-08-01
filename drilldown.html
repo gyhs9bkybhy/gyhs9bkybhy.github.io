@@ -1,0 +1,543 @@
+<!Doctype html>
+<html>
+    <head>
+        <title> Country-Level</title>
+        <script src = 'https://d3js.org/d3.v5.min.js'> </script>
+    </head>
+
+    <body>
+        <div style = 'width: 1080px;'>
+            <h1  text-align = 'center' style = 'font-size: 40px'> Timeline of Covid-19 </h1>
+            <p style = 'font-size: 20px'> From 2020, Covid-19, which was initially called Corona Virus, started spreading. 
+                The first case was reported in China in January, quickly raising public concern and the attention of the centeral government. 
+                Later, Covid-19 spreaded to other countries in Asia, and then to other continents.
+                <br><br>
+                This global pandemic is highly contagious and long-lasting, causing wide-spread panic and many people to lose their lives. 
+                Apart from that, it also indirectly had destructive impacts on the global enconomy. Many business like travelling and resturants 
+                have been closed and many people lost their jobs.
+                <br><br>
+                In this narrative visualization, we will go through the timeline globally and then drill down to the country-level to see 
+                the situations of specific countries.  
+            </p>
+            <p id = 'hint' style = 'color: Tomato'>(Click the button at the bottom to move back to timeline)</p>
+            <h2 id = 'subhead'  text-align = 'center' style = 'font-size: 30px'> A big picture at the country-level </h2>
+            <p id = 'hint_2to3' style = 'color: Tomato'>(Click each point to drill down to a specific country)</p>
+            <svg id = 'mainsvg' width = '1000' height = '800'></svg>
+            <button id = 'switch' onclick="location.href='index.html'" type="button" 
+                        style = 'margin: 10px;
+                        font-weight: 400;
+                        text-align: center;
+                        white-space: nowrap;
+                        vertical-align: middle;
+                        border: 1px solid transparent;
+                        padding: 6px 12px;
+                        font-size: 16px;
+                        line-height: 1.42857143;
+                        border-radius: 4px;
+                        color: #fff;
+                        background-color: #337ab7;
+                        border-color: #2e6da4;'> Back to the timeline </button>
+        </div>
+
+        <script>
+
+            // Some parameters 
+            var g_scatter, g_country;
+            const margin = {top: 50, left: 80, bottom: 60, right: 60};
+            const svgwidth = d3.select('#mainsvg').attr('width');
+            const svgheight = d3.select('#mainsvg').attr('height');
+            const innerwidth = svgwidth - margin.left - margin.right;
+            const innerheight = svgheight - margin.top - margin.bottom;
+            var xScale, yScale;
+            var legend;
+            const duration = 50; // set the duration of transition to 100ms
+            const big_country = ['Brazil', 'China', 'Australia',
+                'Germany', 'India',  'Japan', 'Mexico', 
+                'Nigeria', 'Russia', 'South Africa', 'United States'];
+
+            let alldata = [];
+            let date_lst = [];
+            let country_lst = [];
+
+            const tooltip = d3.select('body').append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0)
+                .style('position', 'absolute');
+
+            // This is the function for initialization
+            const renderInit = function(data){
+
+                let firstday = date_lst[0];
+                xScale = d3.scaleLog()
+                .domain([1, d3.max(data, d => d.Confirmed[date_lst.length - 1])])
+                .range([0, innerwidth]);
+
+                yScale = d3.scaleLog()
+                .domain([d3.max(data, d => d.Death[date_lst.length - 1]), 1])
+                .range([0, innerheight]);
+ 
+                let xAxis = d3.axisBottom(xScale)
+                    .tickValues([1, 10, 100, 1000, 10000, 100000, 1000000, 10000000])
+                    .tickFormat(d3.format('~s'));
+                let yAxis = d3.axisLeft(yScale)
+                    .tickValues([1, 10, 100, 1000, 10000, 100000, 500000])
+                    .tickFormat(d3.format('~s'));
+
+                g_scatter = d3.select('#mainsvg')
+                .append('g')
+                    .attr('id', 'scatterplot')
+                    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+                
+                g_scatter.append('text')
+                .attr('id', 'date_text')
+                .text(date_lst[0].toLocaleDateString());
+
+                data = data.filter(d => (d.Confirmed[0] !== 0 && d.Death[0] !== 0))
+
+
+                g_scatter.selectAll('circle')
+                .data(data, d => d.Country)
+                .enter()
+                .append('circle')
+                    .attr('cx', d => xScale(d.Confirmed[0]))
+                    .attr('cy', d => yScale(d.Death[0]))
+                    .attr('r', 5)
+                    .attr('fill', 'dodgerblue')
+                    .style('opacity', function(d){
+                        if (big_country.indexOf(d.Country) > 0){
+                            return 1;
+                        } 
+                        else{
+                            return 0.3;
+                        }
+                    })
+                    .on('mouseover', function(d){
+                        const tiptext = 'Country: ' + d.Country
+                        + '<br>' + 'Confirmed: ' + d.Confirmed[0].toString()
+                        + '<br>' + 'Death: ' + d.Death[0].toString();
+                            // raise the tooltip around the mouse
+                        tooltip.html(tiptext)
+                        .style('opacity', 1)
+                        .style('top', (event.pageY - 30) + 'px')
+                        .style('left', (event.pageX) + 'px');
+
+                        d3.select(this)
+                        .attr('fill', 'red')
+                        .attr('r', 8)
+                        .style('opacity', 0.5);
+                    })
+                    .on('mouseout', function(d){
+
+                        // raise the tooltip around the mouse
+                        tooltip.style('opacity', 0);
+
+                        d3.select(this)
+                        .attr('fill', 'dodgerblue')
+                        .attr('r', 5)
+                        .style('opacity', function(d){
+                        if (big_country.indexOf(d.Country) > 0){
+                            return 1;
+                        } 
+                        else{
+                            return 0.3;
+                        }
+                        });
+                    });
+                
+                g_scatter.selectAll('.country_text')
+                .data(data, d => d.Country)
+                .enter()
+                .append('text')
+                    .attr('class', 'country_text')
+                    .attr('x', d => xScale(d.Confirmed[0]) - 30)
+                    .attr('y', d => yScale(d.Death[0]) - 30)
+                    .attr('dy', '1em')
+                    .style("text-anchor", "end")
+                    .attr("fill", "#333333")
+                    .text(function(d){
+                        if (big_country.indexOf(d.Country) > 0){
+                            return d.Country;
+                        } 
+                        else{
+                            return '';
+                        }
+                    });
+            
+                let g_xAxis = g_scatter.append('g').call(xAxis)
+                .attr('id', 'xaxis')
+                .attr('transform', `translate(0, ${innerheight})`)
+                .append('text')
+                    .attr('font-size', '2em')
+                    .attr('x', 500)
+                    .attr('y', 50)
+                    .attr('fill', '#333333')
+                    .text('# Confirmed(log)');
+
+                let g_yAxis = g_scatter.append('g').call(yAxis)
+                .attr('id', 'yaxis')
+                .append('text')
+                    .attr('font-size', '2em')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -260)
+                    .attr('y', -60)
+                    .attr('fill', '#333333')               
+                    .text('# Death(log)');
+
+            }
+
+            const renderUpdate = function(data, date_idx){
+
+                // select the scatter plot
+                g_scatter = d3.select('#scatterplot');
+
+                data = data.filter(d => (d.Confirmed[date_idx] !== 0 && d.Death[date_idx] !== 0))
+
+                // update every date
+                let circleupdate = g_scatter.selectAll('circle')
+                .data(data, d => d.Country); // assign a key for matching when updated
+                
+
+                let circleenter = circleupdate.enter()
+                .append('circle')
+                    .attr('cx', d => xScale(d.Confirmed[date_idx]))
+                    .attr('cy', d => yScale(d.Death[date_idx]))
+                    .attr('r', 5)
+                    .attr('fill', 'dodgerblue')
+                    .style('opacity', function(d){
+                        if (big_country.indexOf(d.Country) > 0){
+                            return 1;
+                        } 
+                        else{
+                            return 0.3;
+                        }
+                    });
+
+                
+                circleupdate.merge(circleenter)
+                .transition().duration(duration)
+                .attr('cx', d => xScale(d.Confirmed[date_idx]))
+                .attr('cy', d => yScale(d.Death[date_idx]))
+
+                g_scatter.selectAll('circle')
+                .on('mouseover', function(d){
+
+                    const tiptext = 'Country: ' + d.Country
+                        + '<br>' + 'Confirmed: ' + d.Confirmed[date_idx].toString()
+                        + '<br>' + 'Death: ' + d.Death[date_idx].toString();
+
+                    // raise the tooltip around the mouse
+                    // AN ISSUE HERE: sometimes the mouse is an arrow, other time the cursor(text selection)
+                    // Solution: 1.this is because when mouseout, the text still there just transparent, we should make the text = ''
+                    // 2. when mouseover, the text can be wide and high, so the text cover the arrow, we should set the top, left attribute to make the text away from mouse
+                    tooltip.html(tiptext)
+                    .style('opacity', 1)
+                    .style('top', (event.pageY - 100) + 'px')
+                    .style('left', (event.pageX - 100) + 'px'); 
+
+
+                    d3.select(this)
+                    .attr('fill', 'red')
+                    .attr('r', 8)
+                    .style('opacity', 0.5);
+                    })
+                .on('mouseout', function(d){
+
+                    // raise the tooltip around the mouse
+                    tooltip.html('')
+                    .style('opacity', 0);
+
+                    d3.select(this)
+                    .attr('fill', 'dodgerblue')
+                    .attr('r', 5)
+                    .style('opacity',  function(d){
+                        if (big_country.indexOf(d.Country) > 0){
+                            return 1;
+                        } 
+                        else{
+                            return 0.3;
+                        }
+                        });
+                    })  
+                .on('click', function(d){
+                    g_scatter.style('visibility', 'hidden');
+                    scene3(d.Country);
+                    document.getElementById('switch').innerText = 'Back to the big picture';
+                    document.getElementById('hint').innerText = '(Click the button at the bottom to move back to the big picture)';
+                    document.getElementById('hint_2to3').innerText = '';
+                });
+
+
+                textupdate = g_scatter.selectAll('.country_text').data(data, d => d.Country);
+                textenter = textupdate.enter()
+                .append('text')
+                    .attr('class', 'country_text')
+                    .attr('x', d => xScale(d.Confirmed[date_idx]) - 30)
+                    .attr('y', d => yScale(d.Death[date_idx]) - 30)
+                    .attr('dy', '1em')
+                    .style("text-anchor", "end")
+                    .attr("fill", "#333333")
+                    .text(function(d){
+                        if (big_country.indexOf(d.Country) > 0){
+                            return d.Country;
+                        } 
+                        else{
+                            return '';
+                        }
+                    });
+
+                textupdate.merge(textenter)
+                .transition().duration(duration)
+                .attr('x', d => xScale(d.Confirmed[date_idx]) - 30)
+                .attr('y', d => yScale(d.Death[date_idx]) - 30)
+                .style("text-anchor", "end");
+
+                g_scatter.selectAll('#date_text').remove();
+                g_scatter.append('text')
+                .attr('id', 'date_text')
+                .text(date_lst[date_idx].toLocaleDateString());
+       
+            }
+
+            async function scene3(country){
+
+
+                // retrieve the data of the country, we need to reconstruct to make it an array
+                let country_rawdata = alldata[country_lst.indexOf(country)];
+                let countrydata = [];
+                let i;
+                for (i = 0; i < country_rawdata.Confirmed.length; i++){
+                    let newitem = {'date': date_lst[i], 
+                                'confirmed': country_rawdata.Confirmed[i],
+                                'death': country_rawdata.Death[i]};
+                    countrydata.push(newitem);
+                }
+
+                // xscale is for date
+                let country_xScale = d3.scaleTime()
+                .domain(d3.extent(countrydata, d => d.date))
+                .range([0, innerwidth]);
+
+                // yscale is for total confirmed cases in the world
+                let country_yScale = d3.scaleLinear()
+                .domain([0, d3.max(countrydata, d => d.confirmed)].reverse())
+                .range([0, innerheight]);
+
+                // here is another new scale for the bars for display
+                let barScale = d3.scaleBand()
+                .domain(countrydata.map(d => d.date))
+                .range([0, innerwidth]);
+
+                // add the country group
+                g_country = d3.select('#mainsvg')
+                .append('g')
+                    .attr('id', 'g_country')
+                    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+                g_country.append('text')
+                .attr('id', 'country_text')
+                .text(country.toString());                    
+
+                let country_xAxis = d3.axisBottom(country_xScale)   
+                .tickFormat(d3.timeFormat('%y/%m'));
+                let country_yAxis = d3.axisLeft(country_yScale);
+
+                let g_xAxis = g_country.append('g').call(country_xAxis)
+                .attr('id', 'country_xaxis')
+                .attr('transform', `translate(0, ${innerheight})`)
+                .append('text')
+                    .attr('font-size', '2em')
+                    .attr('x', 500)
+                    .attr('y', 50)
+                    .attr('fill', '#333333')
+                    .text('Date');
+
+                let g_yAxis = g_country.append('g').call(country_yAxis)
+                .attr('id', 'country_yaxis')
+                .append('text')
+                    .attr('font-size', '2em')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('x', -260)
+                    .attr('y', -60)
+                    .attr('fill', '#333333')               
+                    .text('# Cases');
+
+                let confirmed_linefunc = d3.line()
+                .x(d => country_xScale(d.date))
+                .y(d => country_yScale(d.confirmed));
+
+                let confirmed_line = g_country.append('path')
+                .attr('id', 'confirmed_line')
+                .datum(countrydata)
+                .attr('d', confirmed_linefunc)
+                .attr('stroke', 'steelblue')
+                .attr("stroke-width", 1.5)
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr('fill', 'none')
+                .style('opacity', 0.8);
+
+                let death_linefunc = d3.line()
+                .x(d => country_xScale(d.date))
+                .y(d => country_yScale(d.death));
+
+                let death_line = g_country.append('path')
+                .attr('id', 'death_line')
+                .datum(countrydata)
+                .attr('d', death_linefunc)
+                .attr('stroke', 'orange')
+                .attr("stroke-width", 1.5)
+                .attr("stroke-linejoin", "round")
+                .attr("stroke-linecap", "round")
+                .attr('fill', 'none')
+                .style('opacity', 0.8);
+
+                const tooltip = d3.select('body').append('div')
+                    .attr('class', 'tooltip')
+                    .style('opacity', 0)
+                    .style('position', 'absolute');
+
+                // now what i want is vanoid, when every point relates to a opaque bar for selection
+                g_country.selectAll('rect')
+                    .data(countrydata)
+                    .enter()
+                    .append('rect')
+                        .attr('x', d => country_xScale(d.date) - 0.49 * barScale.bandwidth())
+                        .attr('y', 0)
+                        .attr('width', 5 * barScale.bandwidth())
+                        .attr('height', innerheight)
+                        .attr('fill', 'red')
+                        .style('opacity', 0)
+                        .on('mouseover', function(d) { // pay attention => can't define this, has be to function(d)
+                            d3.select(this)
+                            .style('opacity', 0.3);
+                            
+                            // the text for tooptip: date & total cases
+                            const tiptext = 'Date: ' + d.date.toLocaleDateString()
+                             + '<br>' + 'Confirmed: ' + d.confirmed.toString() 
+                             + '<br>' + 'Death: ' + d.death.toString();
+                            // raise the tooltip around the mouse
+                            tooltip.html(tiptext)
+                            .style('opacity', 1)
+                            .style('top', (event.pageY - 100) + 'px')
+                            .style('left', (event.pageX - 100) + 'px');
+                            
+
+                        })
+                        .on('mouseout', function(d) {
+                            d3.select(this)
+                            .style('opacity', 0);
+
+                            tooltip.html('')
+                            .style('opacity', 0);
+
+                        });
+                
+
+                // draw legend
+                if (legend == undefined){
+                    legend = d3.select('#mainsvg').selectAll(".legend")
+                        .data(['Confirmed', 'Death'])
+                        .enter()
+                        .append("g")
+                            .attr("class", "legend")
+                            .attr("transform", function(d, i) { 
+                                return "translate(" + (margin.left + 20) + "," + (i * 30 + margin.top + 20) + ")"; 
+                            });
+                    
+                    // draw legend colored rectangles
+                    legend.append("rect")
+                    .data(['Confirmed', 'Death']) 
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", 30)
+                    .attr("height", 20)
+                    .style("fill", function (d,i) { 
+                        return ['dodgerblue', 'orange'][i];
+                    });
+                    
+                    // draw legend text
+                    legend.append("text")
+                    .data(['Confirmed', 'Death']) 
+                    .attr('class', 'legend_text')
+                    .attr("x", 40)
+                    .attr("y", 9)
+                    .attr("dy", ".5em")
+                    .style("text-anchor", "start")
+                    .text(function (d,i) {
+                        return ['Confirmed', 'Death'][i];
+                    }); 
+                }
+                else{
+                    legend.style('visibility', 'visible');
+                }
+                
+
+                document.getElementById('switch').onclick = switchfrom3to2;
+                document.getElementById('subhead').innerText = 'The situation of ' + country;
+            };
+
+            async function scene2(){
+                
+                // Load the confirmed data
+                let load_confirmed = await d3.csv("confirmed.csv").then(data => {
+                    date_lst = Object.keys(data[0]).slice(3); // store the dates in a list 
+                    date_lst = date_lst.map(d => new Date(d));
+                    
+                    data.forEach(d => {
+
+                        let newcountry = {};
+                        newcountry['Confirmed'] = Object.values(d).slice(3).map(d => +(d));
+                        newcountry['Country'] = d['Country/Region'];
+                        alldata.push(newcountry); //remember push rather than append in js
+
+                    
+                    });
+                    country_lst = alldata.map(d => d.Country);
+                });
+                
+                // Load the death data
+                let load_death = await d3.csv('death.csv').then(data => {
+                    let idx = 0;
+                    data.forEach(d => {
+
+                        alldata[idx]['Death'] = Object.values(d).slice(3).map(d => +(d));
+                        idx += 1;
+
+                    });
+                });
+
+                renderInit(alldata);
+                let idx = 1;
+
+                let interval = setInterval(() => {
+                    if (idx >= date_lst.length){
+                        clearInterval(interval);
+                    }
+                    else{
+                        renderUpdate(alldata, idx);
+                        idx += 1;
+                    }
+                    
+    
+                }, duration);
+
+
+            };
+
+            const switchfrom3to2 = function(){
+                g_scatter.style('visibility', 'visible');
+                g_country.style('visibility', 'hidden');
+                legend.style('visibility', 'hidden');
+                document.getElementById('switch').onclick = function(){location.href='index.html'};
+                document.getElementById('switch').innerText = 'Back to the timeline';
+                document.getElementById('hint').innerText = '(Click the button at the bottom to move back to timeline)';
+                document.getElementById('subhead').innerText = 'A big picture at the country-level';
+                document.getElementById('hint_2to3').innerText = '(Click each point to drill down to a specific country)';
+            };
+            
+            scene2();
+
+            
+        </script>
+    </body>
+</html>
