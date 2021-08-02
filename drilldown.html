@@ -96,7 +96,14 @@
                 
                 g_scatter.append('text')
                 .attr('id', 'date_text')
-                .text(date_lst[0].toLocaleDateString());
+                .attr('transform', `translate(20, 0)`)
+                .text('Date: ' + date_lst[0].toLocaleDateString());
+
+                g_scatter.append('text')
+                .attr('id', 'hint_text')
+                .attr('transform', `translate(20, 40)`)
+                .style('fill', 'orange')
+                .text('(Click each point to drill down)');
 
                 data = data.filter(d => (d.Confirmed[0] !== 0 && d.Death[0] !== 0))
 
@@ -298,8 +305,9 @@
 
                 g_scatter.selectAll('#date_text').remove();
                 g_scatter.append('text')
-                .attr('id', 'date_text')
-                .text(date_lst[date_idx].toLocaleDateString());
+                .attr('id', 'date_text')              
+                .attr('transform', `translate(20, 0)`)
+                .text('Date: ' + date_lst[date_idx].toLocaleDateString());
        
             }
 
