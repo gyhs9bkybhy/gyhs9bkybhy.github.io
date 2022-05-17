@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>和你在一起是前所未有波澜壮阔的旅行</title>
+    <script type="text/javascript" src="js/echarts.js" ></script>
+    <script type="text/javascript" src="js/china.js" ></script>
+    <!-- <script type="text/javascript" src="js/todolist.js" ></script> -->
+    <!--booststrap-->
+
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" media="all">
+    <!--//booststrap end-->
+
+    <!-- font-awesome icons -->
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- //font-awesome icons -->
+
+    <!--stylesheets-->
+    <link href="css/style.css" rel='stylesheet' type='text/css' media="all">
+    <link href="css/my_style.css" rel="stylesheet" type="text/css">
+    <link href="css/todolist.css" rel="stylesheet" type="text/css">
+    <!--//stylesheets-->
+    <link href="http://fonts.googleapis.com/css?family=Great+Vibes" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+    
+</head>
+<body ms-controller="fuyuko">
+    <div class="banner" id="banner">
+        <div class="header-w3layouts">
+            <!-- Navigation -->
+            <div class="container">
+                <div class="header-bar">
+                    <nav class="navbar navbar-default">
+                        <div class="navbar-header navbar-left">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                                    data-target="#bs-example-navbar-collapse-1">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <h2><a class="navbar-brand brand_title">和你在一起是前所未有波澜壮阔的旅行</a></h1>
+                        </div>
+                        <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
+                            <nav>
+                                <ul class="nav navbar-nav">
+                                    <!-- <li><a href="http://www.xiaomaidong.com" target="_blank">ABOUT ME</a></li>
+                                    <li><a href="http://www.xiaomaidong.com/?page_id=105" class="scroll"
+                                           target="_blank">博客</a></li> -->
+                                    <li class="active"><a href="photo_gallery.html" class="scroll">Photo Gallery</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </nav>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id= 'todolist' style="float:left; display:inline"> 
+        <div id="myDIV" class="header">
+            <h2>我们还要！！！</h2>
+            <input type="text" id="myInput" placeholder="Title...">
+            <span onclick="newElement()" class="addBtn">添加</span>
+        </div>
+          
+        <ul id="myUL">
+            <li class="checked">要去湖南吃辣椒炒肉</li>
+            <li>要去东北吃烧烤</li>
+            <li>要去青岛旅游贡献GDP</li>
+            <li>要去云南吃好吃的水果和火烧云</li>
+            <li>要去顺德吃好多好吃的</li>
+            <li>要去贵州吃酸汤肥牛</li>
+            <li>要去成都吃冒菜和蹄花</li>
+        </ul>
+        <script type="text/javascript" src="js/todolist.js" ></script>
+    </div>
+
+    <div id= 'main' style="width: 1200px;height:800px; float:left; display:inline;"> 
+        <script src="js/map.js" ></script>
+    </div>
+
+
+
+</body>
+</html>
